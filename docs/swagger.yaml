@@ -1,0 +1,212 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://api.monipy.sorc3r3r.com/v1
+info:
+  title: sorc3r3r - MoniPy API
+  description: This API is designed to manage monitoring subscriptions.
+  version: "1.0.0"
+  contact:
+    email: jonas@sorc3r3r.com
+  license:
+    name: MIT
+    url: https://github.com/SORC3r3r/monipy/blob/main/LICENSE
+tags:
+  - name: Admin
+    description: Admin stuff.
+  - name: Monitor
+    description: Create, update and delete your monitoring tasks.
+paths:
+# monitor {{{ #
+  /monitor:
+    post:
+      summary: Create a new monitor.
+      operationId: postMonitor
+      description: |
+        Create a new monitor by passing the required parameters in the request body.
+      responses:
+        '201':
+          description: Item created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Monitor'
+        '400':
+          description: Invalid input/required property not set.
+        '401':
+          description: Unauthorized.
+        '409':
+          description: Conflict.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitorCreate'
+      tags:
+        - Monitor
+  /monitor/{monitorId}:
+    get:
+      summary: Get a monitor by monitorId.
+      operationId: getMonitorMonitorId
+      description: |
+        Get a monitor by monitorId.
+      parameters:
+        - name: monitorId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: '4a3fe120-11b3-11ea-88c8-912295edc6ff'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Monitor'
+        '400':
+          description: Invalid input/required property not set.
+        '401':
+          description: Unauthorized.
+      tags:
+        - Monitor
+    put:
+      summary: Update a monitor by monitorId.
+      operationId: putMonitorMonitorId
+      description: |
+        Update a monitor by monitorId.
+      parameters:
+        - name: monitorId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: '4a3fe120-11b3-11ea-88c8-912295edc6ff'
+      responses:
+        '200':
+          description: Item updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorCreate'
+        '400':
+          description: Invalid input/required property not set.
+        '401':
+          description: Unauthorized.
+      tags:
+        - Monitor
+  /monitors:
+    get:
+      summary: Get a list of all monitors.
+      operationId: getMonitors
+      description: |
+        Get a list of all monitors.
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorList'
+        '401':
+          description: Unauthorized.
+      tags:
+        - Monitor
+# }}} monitor #
+components:
+  schemas:
+    Monitor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '4a3fe120-11b3-11ea-88c8-912295edc6ff'
+        reference:
+          type: string
+          description: A semi friendly name for your monitor.
+          example: 'my_monitor-b2b_GET_/my/path'
+          default: (will be set randomly)
+        description:
+          type: string
+          example: 'Monitor for monipy healthcheck'
+          default: ''
+        url:
+          type: string
+          example: 'https://api.monipy.sorc3r3r.com/v1/healthz'
+        interval:
+          type: object
+          properties:
+            value:
+              type: integer
+              example: 5
+              default: 5
+            intervalUnit:
+              type: string
+              enum:
+                - days
+                - hours
+                - minutes
+              example: minutes
+              default: minutes
+        notification:
+          type: object
+          properties:
+            active:
+              type: boolean
+              example: true
+              default: false
+            url:
+              type: string
+              example: https://sorc3r3r.slack.com/alerts/webhooks/9837
+              default: ''
+    MonitorCreate:
+      type: object
+      required:
+        - url
+      properties:
+        reference:
+          type: string
+          description: A semi friendly name for your monitor.
+          example: 'my_monitor-b2b_GET_/my/path'
+          default: (will be set randomly)
+        description:
+          type: string
+          example: 'Monitor for monipy healthcheck'
+          default: ''
+        url:
+          type: string
+          example: 'https://api.monipy.sorc3r3r.com/v1/healthz'
+        interval:
+          type: object
+          properties:
+            value:
+              type: integer
+              example: 5
+              default: 5
+            intervalUnit:
+              type: string
+              enum:
+                - days
+                - hours
+                - minutes
+              example: minutes
+              default: minutes
+        notification:
+          type: object
+          properties:
+            active:
+              type: boolean
+              example: true
+              default: false
+            url:
+              type: string
+              example: https://sorc3r3r.slack.com/alerts/webhooks/9837
+              default: ''
+    MonitorList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Monitor'
